@@ -4,9 +4,42 @@
     <title>Hello World!</title>
     <style type="text/css">
     body {
-    	font-family: "Helvetica Neue", Ubuntu, sans-serif;
+      font-family: "Helvetica Neue", Ubuntu, sans-serif;
     }
     </style>
+    <script type="text/javascript">
+    var open = require("nodegit").Repo.open;
+    open("tmp", function(err, repo) {
+      if (err) {
+        throw err;
+      }
+
+      repo.getMaster(function(err, branch) {
+        if (err) {
+          throw err;
+        }
+
+        var history = branch.history();
+        var count = 0;
+
+        history.on("commit", function(commit) {
+          if (++count >= 9) {
+            return;
+          }
+
+          console.log("commit " + commit.sha());
+
+          var author = commit.author();
+          console.log("Author:\t" + author.name() + " <", author.email() + ">");
+
+          console.log("Date:\t" + commit.date());
+          console.log("\n    " + commit.message());
+        });
+
+        history.start();
+      });
+    });
+    </script>
   </head>
   <body>
     <h1>Hello World!</h1>
