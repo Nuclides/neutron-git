@@ -1,40 +1,80 @@
 /** @jsx React.DOM */
 var React = require('react');
 
-var TodoList = React.createClass({
+var HistoryList = React.createClass({
   render: function() {
-    var createItem = function(itemText) {
-      return <li>{itemText}</li>;
+    var createItem = function(item) {
+      return (
+        <li className="clearfix">
+          <p className="message">{item.message}</p>
+          <p className="sha">{item.sha}</p>
+          <p className="author">{item.author}</p>
+          <p className="email">{item.email}</p>
+          <p className="date">{item.date}</p>
+        </li>
+      );
     };
     return <ul>{this.props.items.map(createItem)}</ul>;
   }
 });
 
-var TodoApp = React.createClass({
+var App = React.createClass({
   getInitialState: function() {
-    return {items: [], text: ''};
+    return {repo: '', history: []};
   },
   onChange: function(e) {
-    this.setState({text: e.target.value});
+    this.setState({repo: e.target.value});
   },
   handleSubmit: function(e) {
     e.preventDefault();
-    var nextItems = this.state.items.concat([this.state.text]);
-    var nextText = '';
-    this.setState({items: nextItems, text: nextText});
+
+    var open = require("nodegit").Repo.open;
+    var app = this;
+    open(this.state.repo, function(err, repo) {
+      if (err) {
+        throw err;
+      }
+
+      repo.getMaster(function(err, branch) {
+        if (err) {
+          throw err;
+        }
+
+        var history = branch.history();
+        var historyList = [];
+        var count = 0;
+
+        history.on("commit", function(commit) {
+          if (++count >= 9) {
+            return;
+          }
+
+          historyList.push({
+            sha:     commit.sha().substring(0, 11),
+            author:  commit.author().name(),
+            email:   commit.author().email(),
+            message: commit.message(),
+            date:    commit.date()
+          });
+
+          app.setState({history: historyList});
+        });
+
+        history.start();
+      });
+    });
   },
   render: function() {
     return (
-      <div>
-        <h3>TODO</h3>
-        <TodoList items={this.state.items} />
+      <div id="sidebar">
         <form onSubmit={this.handleSubmit}>
-          <input onChange={this.onChange} value={this.state.text} />
-          <button>{'Add #' + (this.state.items.length + 1)}</button>
+          <input onChange={this.onChange} value={this.state.repo} />
+          <button>Refresh</button>
         </form>
+        <HistoryList items={this.state.history} />
       </div>
     );
   }
 });
 
-React.renderComponent(<TodoApp />, document.getElementById('main'));
+React.renderComponent(<App />, document.getElementById('main'));
