@@ -1,0 +1,10 @@
+{
+  "name": "Neutron",
+  "version": "0.1.0",
+  "main": "main.js",
+  "dependencies": {
+  	"git-utils": "^2.1.4",
+  	"react": "^0.11.1"
+  }
+}
+
