@@ -9,7 +9,6 @@ var HistoryList = React.createClass({
           <p className="message">{item.message}</p>
           <p className="sha">{item.sha}</p>
           <p className="author">{item.author}</p>
-          <p className="email">{item.email}</p>
           <p className="date">{item.date}</p>
         </li>
       );
@@ -42,13 +41,8 @@ var App = React.createClass({
 
         var history = branch.history();
         var historyList = [];
-        var count = 0;
 
         history.on("commit", function(commit) {
-          if (++count >= 9) {
-            return;
-          }
-
           historyList.push({
             sha:     commit.sha().substring(0, 11),
             author:  commit.author().name(),
