@@ -17,6 +17,7 @@ html, body, #main {
 #sidebar {
   width: 320px;
   height: 100%;
+  float: left;
   overflow-y: auto;
   background-color: #f3f3f3;
   border-right: 1px solid #ccc;
@@ -38,10 +39,11 @@ html, body, #main {
 #sidebar li {
   padding: 12px;
   border-bottom: 1px solid #ccc;
+  word-wrap: break-word;
 }
 
 #sidebar li:hover {
-  background-color: #f3f3f3;
+  background-color: #f6f6f6;
 }
 
 #sidebar p {
@@ -64,4 +66,10 @@ html, body, #main {
 
 #sidebar .sha {
   font-family: Menlo, "Ubuntu Mono", "DejaVu Sans Mono", Consolas, monospace;
+}
+
+#content {
+  float: left;
+  height: 100%;
+  overflow-y: auto;
 }

@@ -1,25 +1,52 @@
 /** @jsx React.DOM */
 var React = require('react');
+var _ = require('underscore');
 
 var HistoryList = React.createClass({
   render: function() {
     var createItem = function(item) {
       return (
-        <li className="clearfix">
-          <p className="message">{item.message}</p>
-          <p className="sha">{item.sha}</p>
-          <p className="author">{item.author}</p>
-          <p className="date">{item.date}</p>
-        </li>
+        <HistoryItem key={item.sha} commit={item} />
       );
     };
     return <ul>{this.props.items.map(createItem)}</ul>;
   }
 });
 
+var HistoryItem = React.createClass({
+  render: function() {
+    return (
+      <li className="clearfix">
+        <p className="message">{this.props.commit.message}</p>
+        <p className="sha">{this.props.commit.sha}</p>
+        <p className="author">{this.props.commit.author}</p>
+        <p className="date">{this.props.commit.date}</p>
+      </li>
+    );
+  }
+});
+
+var CommitViewer = React.createClass({
+  render: function() {
+    if (_.isEmpty(this.props.commit)) {
+      return <div id="current-commit"></div>;
+    }
+    else {
+      return (
+        <div id="current-commit">
+          <p className="message">{this.props.commit.message}</p>
+          <p className="sha">{this.props.commit.sha}</p>
+          <p className="author">{this.props.commit.author}</p>
+          <p className="date">{this.props.commit.date}</p>
+        </div>
+      );
+    }
+  }
+});
+
 var App = React.createClass({
   getInitialState: function() {
-    return {repo: '', history: []};
+    return {repo: '', history: [], currentCommit: {}};
   },
   onChange: function(e) {
     this.setState({repo: e.target.value});
@@ -44,7 +71,7 @@ var App = React.createClass({
 
         history.on("commit", function(commit) {
           historyList.push({
-            sha:     commit.sha().substring(0, 11),
+            sha:     commit.sha().substring(0, 8),
             author:  commit.author().name(),
             email:   commit.author().email(),
             message: commit.message(),
@@ -60,15 +87,20 @@ var App = React.createClass({
   },
   render: function() {
     return (
-      <div id="sidebar">
-        <form onSubmit={this.handleSubmit}>
-          <input onChange={this.onChange} value={this.state.repo} />
-          <button>Refresh</button>
-        </form>
-        <HistoryList items={this.state.history} />
+      <div id="app" className="clearfix">
+        <div id="sidebar">
+          <form onSubmit={this.handleSubmit}>
+            <input onChange={this.onChange} value={this.state.repo} />
+            <button>Refresh</button>
+          </form>
+          <HistoryList items={this.state.history} />
+        </div>
+        <div id="content">
+          <CommitViewer commit={this.state.currentCommit} />
+        </div>
       </div>
     );
   }
 });
 
-React.renderComponent(<App />, document.getElementById('main'));
+React.renderComponent(<App />, document.body);
