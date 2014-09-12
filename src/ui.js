@@ -1,6 +1,8 @@
 /** @jsx React.DOM */
-var React = require('react');
+var React = require('react/addons');
 var _ = require('underscore');
+var EventEmitter = require('events').EventEmitter;
+var ee = new EventEmitter;
 
 var HistoryList = React.createClass({
   render: function() {
@@ -14,9 +16,34 @@ var HistoryList = React.createClass({
 });
 
 var HistoryItem = React.createClass({
+  getInitialState: function() {
+    return {selected: false};
+  },
+  handleClick: function(event) {
+    ee.emit('list-select-change', {sha: this.props.commit.sha});
+  },
+  selectedCommitChanged: function(e) {
+    if (e.sha === this.props.commit.sha) {
+      this.setState({selected: true});
+    }
+    else {
+      this.setState({selected: false});
+    }
+  },
+  componentDidMount: function(event) {
+    ee.on('list-select-change', this.selectedCommitChanged);
+  },
+  componentWillUnmount: function(event) {
+    ee.removeListener('list-select-change', this.selectedCommitChanged);
+  },
   render: function() {
+    var cx = React.addons.classSet;
+    var classes = cx({
+      'clearfix': true,
+      'selected': this.state.selected
+    });
     return (
-      <li className="clearfix">
+      <li className="clearfix" className={classes} onClick={this.handleClick}>
         <p className="message">{this.props.commit.message}</p>
         <p className="sha">{this.props.commit.sha}</p>
         <p className="author">{this.props.commit.author}</p>

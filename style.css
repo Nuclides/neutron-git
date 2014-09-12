@@ -46,6 +46,10 @@ html, body, #main {
   background-color: #f6f6f6;
 }
 
+#sidebar li.selected {
+  background-color: #f9f9f9;
+}
+
 #sidebar p {
   margin: 0;
 }
