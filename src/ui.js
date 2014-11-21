@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 var React = require('react/addons');
 var _ = require('underscore');
 var EventEmitter = require('events').EventEmitter;
@@ -130,4 +129,4 @@ var App = React.createClass({
   }
 });
 
-React.renderComponent(<App />, document.body);
+React.render(<App />, document.body);
