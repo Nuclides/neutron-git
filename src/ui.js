@@ -79,6 +79,9 @@ var App = React.createClass({
   },
   handleSubmit: function(e) {
     e.preventDefault();
+    if (this.state.repo == "") {
+      return;
+    }
 
     var open = require("nodegit").Repo.open;
     var app = this;
